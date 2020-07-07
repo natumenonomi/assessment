@@ -5,12 +5,12 @@ const resultDivided = document.getElementById('result-area');
 const tweetDivided = document.getElementById('tweet-area');
 
 /**
- * 指定した要素の子どもを全て除去する
+ * 指定した要素の子どもを全て削除する
  * @param {HTMLElement} element HTMLの要素
  */
 function removeAllChildren(element) {
   while (element.firstChild) {
-    // 子どもの要素があるかぎり除去
+    // 子どもの要素があるかぎり削除
     element.removeChild(element.firstChild);
   }
 }
@@ -22,7 +22,7 @@ assessmentButton.onclick = () => {
     return;
   }
 
-  // 診断結果表示エリアの作成
+  // 診断結果の表示
   removeAllChildren(resultDivided);
   const header = document.createElement('h3');
   header.innerText = '診断結果';
@@ -33,27 +33,45 @@ assessmentButton.onclick = () => {
   paragraph.innerText = result;
   resultDivided.appendChild(paragraph);
 
-  // ツイートエリアの作成
-  removeAllChildren(tweetDivided);
-  const anchor = document.createElement('a');
-  const hrefValue =
-    'https://twitter.com/intent/tweet?button_hashtag=' +
-    encodeURIComponent('あなたのいいところ') +
-    '&ref_src=twsrc%5Etfw';
-  anchor.setAttribute('href', hrefValue);
-  anchor.className = 'twitter-hashtag-button';
-  anchor.setAttribute('data-text', result);
-  anchor.innerText = 'Tweet #あなたのいいところ';
-  tweetDivided.appendChild(anchor);
+  // ツイートボタンの表示
+  removeAllChildren(tweetDivided);//診断エリアの初期化
 
-  // widgets.js の設定
+  //aタグを作って属性を設定する
+
+  const a = document.createElement('a');
+const hrefValue =
+  'https://twitter.com/intent/tweet?button_hashtag='
+  +encodeURIComponent('あなたのいいところ')
+  +'&ref_src=twsrc%5Etfw';
+a.setAttribute('href', hrefValue);
+a.className = 'twitter-hashtag-button';
+a.setAttribute('data-text', result);
+a.innerText = 'Tweet #あなたのいいところ';
+//*setAttributeのところ空白が1つ必要*
+tweetDivided.appendChild(a);
+ 　
+ //Tweetボタンの表示
+
+//aタグをHTMLとして追加する
+ tweetDivided.appendChild(a);
+
+  // scriptタグをつくる
   const script = document.createElement('script');
   script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
+  //scriptタグをHTMLとして追加する
   tweetDivided.appendChild(script);
 };
 
+//入力欄でEnterキーを押したときに診断を実行する
+userNameInput.onkeydown = event => {
+  if (event.key === 'Enter') {
+    assessmentButton.onclick();
+  }
+    // TODO ボタンのonclick() 処理を呼び出す
+};
+
 const answers = [
-  '{userName}のいいところは声です。{userName}の特徴的な声はみなを惹きつけ、心に残ります。',
+  '{userName}のいいところは声です。{userName}の特徴的な声は皆を惹きつけ、心に残ります。',
   '{userName}のいいところはまなざしです。{userName}に見つめられた人は、気になって仕方がないでしょう。',
   '{userName}のいいところは情熱です。{userName}の情熱に周りの人は感化されます。',
   '{userName}のいいところは厳しさです。{userName}の厳しさがものごとをいつも成功に導きます。',
@@ -78,16 +96,16 @@ const answers = [
  */
 function assessment(userName) {
   // 全文字のコード番号を取得してそれを足し合わせる
-  let sumOfcharCode = 0;
+  let sumOfCharCode = 0;
   for (let i = 0; i < userName.length; i++) {
-    sumOfcharCode = sumOfcharCode + userName.charCodeAt(i);
+    sumOfCharCode = sumOfCharCode + userName.charCodeAt(i);
   }
 
   // 文字のコード番号の合計を回答の数で割って添字の数値を求める
-  const index = sumOfcharCode % answers.length;
+  const index = sumOfCharCode % answers.length;
   let result = answers[index];
 
-  result = result.replace(/{userName}/g, userName);
+  result = result.replace(/\{userName\}/g, userName);
   return result;
 }
 
